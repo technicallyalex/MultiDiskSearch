@@ -21,7 +21,6 @@ Resolve also offers a deep disk search; see Blackmagic Design's [relinking guide
 - Duplicate-source selection, thumbnails, path search and status filters.
 - Progress indicators, clip counts and a resizable Qt Quick interface.
 - Automatic exclusion of protected system folders, recycle bins and directory links.
-- Local processing with no footage uploads.
 
 ## Installation
 
