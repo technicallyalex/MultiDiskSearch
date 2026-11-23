@@ -1,0 +1,12 @@
+.venv/
+__pycache__/
+*.log
+gui-preview.png
+qa-artifacts/
+dist/
+.env
+.env.*
+!.env.example
+.codex/
+.agents/
+*.pyc
