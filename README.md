@@ -1,7 +1,4 @@
 # Multi Disk Search
-
-**Version 1.0.0 · Windows · DaVinci Resolve Studio**
-
 **A powerful alternative to DaVinci Resolve's built-in media relinking tool.**
 
 Find missing footage across multiple drives and directories in one search. Multi Disk Search automatically searches your saved locations, finds matching files and lets you reconnect them to your project together—saving you from repeating the search for each disk or folder.
