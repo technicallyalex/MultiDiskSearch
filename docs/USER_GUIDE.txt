@@ -1,12 +1,12 @@
-MULTI DISK SEARCH 1.0.0
+MultiDiskSearch 1.0.1
 
 Requirements
 Windows 10/11, 64-bit, and DaVinci Resolve Studio 21.2.
 The installer includes the application runtime. No separate Python installation
-or package downloads are needed to run Multi Disk Search.
+or package downloads are needed to run MultiDiskSearch.
 
 Installation
-Run MultiDiskSearch-1.0.0-Setup.exe and follow the setup wizard.
+Run MultiDiskSearch-1.0.1-Setup.exe and follow the setup wizard.
 Restart Resolve Studio after installation.
 
 Launch
@@ -40,7 +40,7 @@ Saved locations: %APPDATA%\MultiDiskSearch\settings.json
 Startup log: %APPDATA%\MultiDiskSearch\qt.log
 
 Uninstall
-Use Windows Settings > Apps > Installed apps > Multi Disk Search > Uninstall.
+Use Windows Settings > Apps > Installed apps > MultiDiskSearch > Uninstall.
 Saved locations, Resolve projects and media are preserved.
 
 Third-party licenses

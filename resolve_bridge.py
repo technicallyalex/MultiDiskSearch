@@ -76,7 +76,7 @@ def frontend_command(directory, port):
     runtime = directory / '.venv/Scripts/pythonw.exe'
     if runtime.is_file():
         return [str(runtime), str(directory / 'qt_app.py'), str(port)]
-    raise RuntimeError('The application runtime is missing. Reinstall Multi Disk Search.')
+    raise RuntimeError('The application runtime is missing. Reinstall MultiDiskSearch.')
 
 
 def serve(resolve, directory):

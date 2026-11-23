@@ -1,15 +1,15 @@
-# Multi Disk Search
+# MultiDiskSearch
 **A powerful alternative to DaVinci Resolve's built-in media relinking tool.**
 
 Find and reconnect missing footage across multiple saved drives and folders in one search.
 
-![Multi Disk Search with saved search locations and media results](docs/images/main-window.png)
+![MultiDiskSearch with saved search locations and media results](docs/images/main-window.png)
 
 *Interface shown with example media.*
 
 ## Go beyond folder-by-folder relinking
 
-Resolve's built-in **Relink Selected Clips** tool only lets you manually search one directory at time. When footage is scattered across separate disks and folders, searching location by location adds manual work. **Multi Disk Search searches a saved list of locations together**, then puts matches, duplicate candidates and missing files in one review window.
+Resolve's built-in **Relink Selected Clips** tool only lets you manually search one directory at time. When footage is scattered across separate disks and folders, searching location by location adds manual work. **MultiDiskSearch searches a saved list of locations together**, then puts matches, duplicate candidates and missing files in one review window.
 
 Resolve also offers a deep disk search; see Blackmagic Design's [relinking guide](https://documents.blackmagicdesign.com/UserManuals/DaVinci-Resolve-20-Beginners-Guide.pdf).
 
@@ -32,15 +32,15 @@ Resolve also offers a deep disk search; see Blackmagic Design's [relinking guide
 
 ### Install
 
-1. [Download the Windows installer](https://github.com/technicallyalex/MultiDiskSearch/releases/download/v1.0.0/MultiDiskSearch-1.0.0-Setup.exe), then run **MultiDiskSearch-1.0.0-Setup.exe**.
+1. [Download the Windows installer](https://github.com/technicallyalex/MultiDiskSearch/releases/download/v1.0.1/MultiDiskSearch-1.0.1-Setup.exe), then run **MultiDiskSearch-1.0.1-Setup.exe**.
 2. Follow the setup wizard and approve the Windows administrator prompt when requested.
 3. Restart DaVinci Resolve Studio.
 
 The installer includes the runtime and registers the integration. **No separate Python installation or package downloads are required.**
 
-See the [v1.0.0 release](https://github.com/technicallyalex/MultiDiskSearch/releases/tag/v1.0.0) for release notes and the installer SHA-256 checksum.
+See the [v1.0.1 release](https://github.com/technicallyalex/MultiDiskSearch/releases/tag/v1.0.1) for release notes and the installer SHA-256 checksum.
 
-## Using Multi Disk Search in Resolve
+## Using MultiDiskSearch in Resolve
 
 1. **Open your project** in DaVinci Resolve Studio.
 2. **Launch the tool from Resolve's top menu:** **Workspace > Workflow Integrations > MultiDiskSearch**.
@@ -75,14 +75,14 @@ Report bugs and request features through [GitHub Issues](https://github.com/tech
 
 ## Uninstall
 
-Open **Windows Settings > Apps > Installed apps > Multi Disk Search > Uninstall**. Saved search locations, Resolve projects and media are preserved.
+Open **Windows Settings > Apps > Installed apps > MultiDiskSearch > Uninstall**. Saved search locations, Resolve projects and media are preserved.
 
 ## Documentation
 
 - [User guide](docs/USER_GUIDE.txt)
-- [Version 1.0.0 release notes](docs/RELEASE_NOTES.md)
+- [Version 1.0.1 release notes](docs/RELEASE_NOTES.md)
 - [Validation and compatibility scope](docs/QA_REPORT.md)
 - [Building from source](docs/BUILD.md)
 - [Third-party components and license notices](packaging/THIRD_PARTY_NOTICES.md)
 
-Multi Disk Search is an independent application and is not affiliated with or endorsed by Blackmagic Design. DaVinci Resolve is a trademark of Blackmagic Design.
+MultiDiskSearch is an independent application and is not affiliated with or endorsed by Blackmagic Design. DaVinci Resolve is a trademark of Blackmagic Design.

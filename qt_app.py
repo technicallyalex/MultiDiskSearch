@@ -350,7 +350,7 @@ def main():
     QQuickStyle.setStyle('Basic')
     app = QGuiApplication(sys.argv)
     load_fonts()
-    app.setApplicationName('Multi Disk Search')
+    app.setApplicationName('MultiDiskSearch')
     app.setApplicationVersion(VERSION)
     app.setWindowIcon(brand_icon())
     bridge = Bridge(args.port) if args.port is not None else None

@@ -69,7 +69,11 @@ def main():
                 if r >= 60 and g >= 100 and b >= 180:
                     md.add((x,y))
             elif min(r,g,b) > 150:
-                wordmark.add((x,y))
+                # Remove the two word spaces while retaining the approved glyphs.
+                shift = 24 if x >= 890 else 0
+                if x >= 1166:
+                    shift += 14
+                wordmark.add((x-shift,y))
     shadow = silhouette - md
     definitions = '<defs><linearGradient id="shadow" x1="340" y1="94" x2="526" y2="94" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#1242bc"/><stop offset="0.5" stop-color="#2c4e98"/><stop offset="1" stop-color="#414d68" stop-opacity="0.8"/></linearGradient></defs>'
     shapes = f'<path d="{trace(shadow)}" fill="url(#shadow)" fill-rule="evenodd"/><path d="{trace(md)}" fill="#699aff" fill-rule="evenodd"/>'
@@ -77,7 +81,7 @@ def main():
     def save(name, width, height, body):
         (ROOT/'assets/brand'/name).write_text(f'<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}" viewBox="0 0 {width} {height}">{definitions}{body}</svg>\n',encoding='utf-8')
     save('mds-mark.svg',526,188,shapes)
-    save('mds-lockup.svg',1574,188,shapes+text)
+    save('mds-lockup.svg',1536,188,shapes+text)
     save('mds-icon.svg',256,256,'<rect width="256" height="256" rx="48" fill="#090c12"/><g transform="translate(27 92) scale(0.384)">'+shapes+'</g>')
     print('Traced approved MDS geometry and wordmark to transparent SVG assets.')
 

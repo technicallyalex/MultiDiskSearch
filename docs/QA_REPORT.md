@@ -1,4 +1,4 @@
-# Version 1.0.0 validation
+# Version 1.0.1 validation
 
 Platform: Windows x64. Resolve API baseline: DaVinci Resolve Studio 21.2.0.6.
 

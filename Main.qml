@@ -9,7 +9,7 @@ ApplicationWindow {
     visible: true
     width: 1480; height: 900
     minimumWidth: 1000; minimumHeight: 620
-    title: "Multi Disk Search"
+    title: "MultiDiskSearch"
     color: Theme.window
     font.family: "Segoe UI"; font.pixelSize: 13
     palette.window: "#202020"; palette.windowText: "#dedede"
@@ -71,10 +71,10 @@ ApplicationWindow {
             Image {
                 objectName: "brandMark"
                 source: "assets/brand/mds-lockup.svg"
-                sourceSize.width: 1574; sourceSize.height: 188
+                sourceSize.width: 1536; sourceSize.height: 188
                 Layout.preferredWidth: 410; Layout.preferredHeight: 52
                 fillMode: Image.PreserveAspectFit
-                Accessible.name: "Multi Disk Search"
+                Accessible.name: "MultiDiskSearch"
             }
             Item { Layout.fillWidth: true }
             ActionButton { text: "Find missing media"; accent: true; enabled: backend.connected && !backend.busy; onClicked: backend.find() }

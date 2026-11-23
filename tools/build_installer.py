@@ -38,7 +38,7 @@ def main():
         raise RuntimeError('Could not generate installer icon.')
     parts = tuple(int(n) for n in VERSION.split('.')) + (0,)
     version_info = build/'version-info.txt'
-    version_info.write_text(f'''VSVersionInfo(ffi=FixedFileInfo(filevers={parts!r}, prodvers={parts!r}, mask=0x3f, flags=0, OS=0x40004, fileType=1, subtype=0, date=(0,0)), kids=[StringFileInfo([StringTable('040904B0', [StringStruct('ProductName','Multi Disk Search'), StringStruct('FileDescription','Multi Disk Search'), StringStruct('FileVersion','{VERSION}'), StringStruct('ProductVersion','{VERSION}')])]), VarFileInfo([VarStruct('Translation',[1033,1200])])])''', encoding='utf-8')
+    version_info.write_text(f'''VSVersionInfo(ffi=FixedFileInfo(filevers={parts!r}, prodvers={parts!r}, mask=0x3f, flags=0, OS=0x40004, fileType=1, subtype=0, date=(0,0)), kids=[StringFileInfo([StringTable('040904B0', [StringStruct('ProductName','MultiDiskSearch'), StringStruct('FileDescription','MultiDiskSearch'), StringStruct('FileVersion','{VERSION}'), StringStruct('ProductVersion','{VERSION}')])]), VarFileInfo([VarStruct('Translation',[1033,1200])])])''', encoding='utf-8')
     command = [sys.executable, '-m', 'PyInstaller', '--noconfirm', '--clean', '--onedir', '--windowed',
                '--name', 'MultiDiskSearch', '--icon', str(icon), '--version-file', str(version_info),
                '--distpath', str(build/'bundle'), '--workpath', str(build/'pyinstaller'),

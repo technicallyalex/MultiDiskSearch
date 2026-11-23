@@ -1,4 +1,9 @@
-# Multi Disk Search 1.0.0
+# MultiDiskSearch 1.0.1
+
+- Standardized the app name as **MultiDiskSearch** throughout the interface, wordmark, Windows installer, shortcuts and documentation.
+- Updated interface screenshots to match the current branding.
+
+# MultiDiskSearch 1.0.0
 
 Initial release for 64-bit Windows and DaVinci Resolve Studio 21.2.
 

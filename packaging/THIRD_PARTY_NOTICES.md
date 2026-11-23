@@ -1,6 +1,6 @@
 # Third-party components
 
-Multi Disk Search 1.0.0 bundles Python 3.14.6, PySide6/Shiboken6 6.12.0 and Qt 6.12.0 shared libraries. The executable is assembled with PyInstaller 6.22.3 and the installer is built with NSIS 3.12.
+MultiDiskSearch 1.0.1 bundles Python 3.14.6, PySide6/Shiboken6 6.12.0 and Qt 6.12.0 shared libraries. The executable is assembled with PyInstaller 6.22.3 and the installer is built with NSIS 3.12.
 
 - Python: Python Software Foundation license and incorporated component notices. See licenses/Python-LICENSE.txt and https://www.python.org/downloads/source/.
 - PySide6, Shiboken6 and the included Qt modules: used under the applicable LGPL v3 terms. Copies of LGPL v3 and GPL v3 are in licenses/. Component notices distributed with the wheels are retained there. Source: https://download.qt.io/official_releases/QtForPython/pyside6/ and https://download.qt.io/official_releases/qt/6.12/.

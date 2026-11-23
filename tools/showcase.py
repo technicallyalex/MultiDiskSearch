@@ -33,7 +33,7 @@ def prepare(resolve):
     for name, pattern in [('Camera_A.mov', 'testsrc2=size=640x360:rate=24'), ('Camera_B.mov', 'smptebars=size=640x360:rate=24')]:
         subprocess.run([ffmpeg, '-v', 'error', '-f', 'lavfi', '-i', pattern, '-t', '1', '-c:v', 'dnxhd', '-profile:v', 'dnxhr_lb', '-pix_fmt', 'yuv422p', '-y', str(original / name)], check=True, timeout=30)
     subprocess.run([ffmpeg, '-v', 'error', '-f', 'lavfi', '-i', 'sine=frequency=440:duration=1', '-y', str(original / 'Ambience.wav')], check=True, timeout=10)
-    name = 'Multi Disk Search v1 QA ' + run.name
+    name = 'MultiDiskSearch v1 QA ' + run.name
     project = manager.CreateProject(name)
     if not project:
         raise RuntimeError('Could not create screenshot project.')
