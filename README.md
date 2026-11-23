@@ -1,66 +1,48 @@
 # Multi Disk Search
 
-**v1.0.0 · Windows · Resolve Studio Workflow Integration**
+**Version 1.0.0 · Windows · DaVinci Resolve Studio**
 
-Search saved disks and folders for missing project media, review matches and duplicates, then relink with Resolve's native API. The Qt Quick interface uses the approved rounded blue MDS identity.
+Multi Disk Search finds missing project media across saved disks and folders and relinks it through Resolve's native media-pool API.
 
 ## Install
 
-Run in PowerShell from this folder:
+1. Run **MultiDiskSearch-1.0.0-Setup.exe**.
+2. Follow the setup wizard, then restart Resolve Studio.
+3. Open a project and choose **Workspace > Workflow Integrations > MultiDiskSearch**.
 
-```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File .\Install.ps1
-```
+The installer includes the application runtime and adds an entry to Windows Installed apps. No separate Python installation or package downloads are required. The project folder is not needed after installation.
 
-The installer registers **Workspace > Workflow Integrations > MultiDiskSearch**, removes this application's obsolete Scripts-menu launchers, and preserves saved locations. Restart Resolve to refresh its menus. Keep this application folder in place; the installed launcher points to it. Installing into ProgramData requires write permission there.
-
-Requires Windows, Python 3.10+ and Resolve Studio scripting support. The private .venv contains the Qt runtime; first-time setup downloads PySide6. Version 1 is distributed as source with an installer script, not a self-contained executable. External scripting does not need to be enabled. See the QA report for verified coverage and remaining limitations.
+**Requirements:** 64-bit Windows 10/11 and DaVinci Resolve Studio 21.2.
 
 ## Use
 
-1. Open a project and launch MultiDiskSearch from Workflow Integrations.
-2. Add media disks or folders. Their names and paths are saved automatically.
-3. Choose **Find missing media**. Protected system/recovery/recycle folders and directory links are excluded.
-4. Review results using the text and status filters. Counters summarize the entire scan.
-5. Choose **Sources** to resolve duplicate or incomplete-search results. Any search error prevents automatic target selection because additional duplicates might be hidden on an unreadable disk.
-6. Choose **Relink matches**, then save the project in Resolve. Failed targets remain available for retry.
+- Add the media disks or folders to search. Locations are saved automatically.
+- Click **Find missing media**.
+- Review matches and choose **Sources** when more than one file has the same name.
+- Click **Relink matches**, then save the project in Resolve.
 
-Matching uses filename and extension, ignoring case. It does not compare media content, duration or timecode. Accessible source files are skipped. Image-sequence patterns, renamed media, spanned packages and advanced subclip/synced-media cases need additional validation.
+The interface includes thumbnails, text and status filters, clip counts and progress indicators. Searches exclude protected system folders and directory links. If a location cannot be searched, a source must be chosen explicitly because additional duplicates may exist there. Failed relink targets remain available for retry.
 
-Previews use optional local FFmpeg and Resolve's frame export API, with placeholders when unavailable. Footage stays local. Progress reports folder/clip counts once totals are known; discovery shows activity without an invented percentage. Stop finishes the current folder or clip operation. A stopped search cannot provide automatic matches.
+## Matching and previews
 
-## Project layout
+Matching uses the original filename and extension, ignoring case. It does not compare footage contents, duration or timecode. Existing accessible source files are skipped. Image-sequence patterns, renamed footage, spanned packages and advanced synced-media/subclip workflows are not covered by automatic matching.
 
-| Location | Contents |
-| --- | --- |
-| Root Python/QML files | Current application and launcher |
-| assets/brand/ | Transparent SVG mark, wordmark and window icon |
-| .venv/ | Required private runtime; do not delete while using the application |
-| tests/ | Automated regression and UI checks |
-| tools/ | Preview builder and opt-in disposable Resolve test |
-| docs/ | Current QA report, historical QA, plugin plan, release notes and retained UI preview |
-| design/branding/ | Preserved logo explorations and generation prompts; not installed or packaged |
-| dist/ | Current source package and SHA-256 checksum |
+Previews come from Resolve where available. An optional locally installed FFmpeg can decode previews of found sources. Media stays on your computer.
 
-Settings: `%APPDATA%\MultiDiskSearch\settings.json`. Startup diagnostics: `%APPDATA%\MultiDiskSearch\qt.log`. These are outside the project and survive updates/uninstall.
+## Settings and removal
 
-## Development and QA
+Saved locations: `%APPDATA%\MultiDiskSearch\settings.json`
 
-```powershell
-.\.venv\Scripts\python.exe -B -m unittest -v
-powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\Build-Preview.ps1
-```
+Startup log: `%APPDATA%\MultiDiskSearch\qt.log`
 
-Tests run from the project root and generate disposable outputs under qa-artifacts/. The preview ZIP excludes runtime, tests, test media, design explorations and SDK binaries. Its installer still needs Python and a first-time dependency download.
+Uninstall through **Windows Settings > Apps > Installed apps > Multi Disk Search**. Saved locations, Resolve projects and media are preserved.
 
-[Current QA](docs/QA_REPORT.md) · [Plugin plan](docs/PLUGIN_PLAN.md) · [Release notes](docs/RELEASE_NOTES.md)
+## Interface
 
-Run `Uninstall.ps1` to remove the Workflow Integration launcher. It checks installation ownership and preserves saved settings, application files and media. The optional `-Target Scripts` switch exists only for removing legacy launchers.
+These previews use representative example rows.
 
-## UI previews
+![Multi Disk Search](docs/images/main-window.png)
 
-These are offscreen renders of the v1 interface with representative test rows, not completed live search-and-relink screenshots. The mark and wordmark are transparent SVG outlines traced from the approved mockup, with the shadow-S gradient. Live capture was interrupted with Escape and remains pending.
+![Compact window](docs/images/compact-window.png)
 
-![Multi Disk Search v1 interface](docs/images/app-preview.png)
-
-![Minimum window size](docs/images/app-minimum.png)
+[User guide](docs/USER_GUIDE.txt) · [Release notes](docs/RELEASE_NOTES.md) · [Validation](docs/QA_REPORT.md) · [Building from source](docs/BUILD.md)

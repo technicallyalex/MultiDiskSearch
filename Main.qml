@@ -77,7 +77,7 @@ ApplicationWindow {
                 Accessible.name: "Multi Disk Search"
             }
             Item { Layout.fillWidth: true }
-            ActionButton { text: "Find missing media"; accent: true; enabled: !backend.busy; onClicked: backend.find() }
+            ActionButton { text: "Find missing media"; accent: true; enabled: backend.connected && !backend.busy; onClicked: backend.find() }
             ActionButton { text: "Relink " + backend.readyCount + (backend.readyCount === 1 ? " match" : " matches"); enabled: !backend.busy && backend.readyCount > 0; onClicked: backend.relink() }
         }
         Rectangle {

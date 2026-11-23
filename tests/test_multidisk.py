@@ -6,10 +6,16 @@ PROJECT_ROOT = Path(__file__).resolve().parents[1]
 from unittest.mock import Mock, patch
 
 from relink_core import scan, filename, collect, protected_location, location_name
-from resolve_bridge import Session, valid_auth
+from resolve_bridge import Session, valid_auth, frontend_command
 
 
 class SearchTests(unittest.TestCase):
+    def test_packaged_runtime_is_used_without_python_dependency(self):
+        with tempfile.TemporaryDirectory(dir=Path(__file__).parent) as temp:
+            executable = Path(temp) / 'MultiDiskSearch.exe'
+            executable.touch()
+            self.assertEqual(frontend_command(temp, 12345), [str(executable), '12345'])
+
     def test_malformed_bridge_auth_does_not_crash_host(self):
         for payload in (b'', b'broken', b'[]', b'{"token":12}', b'{"token":"wrong"}'):
             self.assertFalse(valid_auth(payload, 'expected'))

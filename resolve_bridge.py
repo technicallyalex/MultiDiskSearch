@@ -68,11 +68,19 @@ class Session:
         raise ValueError('Unknown command')
 
 
+def frontend_command(directory, port):
+    directory = Path(directory)
+    executable = directory / 'MultiDiskSearch.exe'
+    if executable.is_file():
+        return [str(executable), str(port)]
+    runtime = directory / '.venv/Scripts/pythonw.exe'
+    if runtime.is_file():
+        return [str(runtime), str(directory / 'qt_app.py'), str(port)]
+    raise RuntimeError('The application runtime is missing. Reinstall Multi Disk Search.')
+
+
 def serve(resolve, directory):
     directory = Path(directory)
-    runtime = directory / '.venv/Scripts/pythonw.exe'
-    if not runtime.exists():
-        raise RuntimeError('Qt runtime missing. Run Install.ps1 again.')
     session = Session(resolve)
     token = secrets.token_hex(32)
     with socket.socket() as listener:
@@ -86,7 +94,7 @@ def serve(resolve, directory):
         logdir = Path(os.environ['APPDATA']) / 'MultiDiskSearch'
         logdir.mkdir(parents=True, exist_ok=True)
         with (logdir / 'qt.log').open('w', encoding='utf-8') as log:
-            process = subprocess.Popen([str(runtime), str(directory / 'qt_app.py'), str(listener.getsockname()[1])], env=env, stdout=log, stderr=log)
+            process = subprocess.Popen(frontend_command(directory, listener.getsockname()[1]), env=env, stdout=log, stderr=log)
             while process.poll() is None:
                 try:
                     connection, _ = listener.accept()

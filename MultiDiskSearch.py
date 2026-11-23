@@ -14,10 +14,10 @@ def application_directory():
     else:
         script_path = globals().get('__file__')
         if not script_path:
-            raise RuntimeError('Application location missing. Run Install.ps1 again.')
+            raise RuntimeError('Application location missing. Reinstall Multi Disk Search.')
         config = Path(script_path).with_suffix('.json')
         directory = Path(json.loads(config.read_text(encoding='utf-8-sig'))['directory']) if config.exists() else Path(script_path).parent
-    if not (directory / 'resolve_bridge.py').is_file() or not (directory / 'qt_app.py').is_file():
+    if not (directory / 'resolve_bridge.py').is_file() or not ((directory / 'qt_app.py').is_file() or (directory / 'MultiDiskSearch.exe').is_file()):
         raise RuntimeError('Application files are missing. Reinstall Multi Disk Search from its application folder.')
     return str(directory)
 

@@ -8,6 +8,7 @@ import socket
 import subprocess
 import sys
 import threading
+import argparse
 from copy import deepcopy
 
 from PySide6.QtCore import QObject, Property, Signal, Slot, QThread, QUrl, QTimer
@@ -91,6 +92,7 @@ class Controller(QObject):
     rootsChanged = Signal()
     candidatesReady = Signal('QVariantList', int)
     appVersion = Property(str, lambda self: VERSION, constant=True)
+    connected = Property(bool, lambda self: self.bridge is not None, constant=True)
 
     def __init__(self, bridge, config=None):
         super().__init__()
@@ -340,26 +342,48 @@ class Controller(QObject):
 
 
 def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('port', nargs='?', type=int)
+    parser.add_argument('--smoke-test', action='store_true', help=argparse.SUPPRESS)
+    parser.add_argument('--report', help=argparse.SUPPRESS)
+    args = parser.parse_args()
     QQuickStyle.setStyle('Basic')
     app = QGuiApplication(sys.argv)
     load_fonts()
     app.setApplicationName('Multi Disk Search')
     app.setApplicationVersion(VERSION)
     app.setWindowIcon(brand_icon())
-    bridge = Bridge(int(sys.argv[1]))
+    bridge = Bridge(args.port) if args.port is not None else None
     settings_override = os.environ.get('MDS_SETTINGS_PATH')
     controller = Controller(bridge, Path(settings_override) if settings_override else None)
+    if bridge is None:
+        controller._status = 'Open Workspace > Workflow Integrations > MultiDiskSearch in Resolve Studio.'
     engine = QQmlApplicationEngine()
     engine.rootContext().setContextProperty('backend', controller)
+    warnings = []
+    engine.warnings.connect(lambda entries: warnings.extend(entry.toString() for entry in entries))
     engine.load(QUrl.fromLocalFile(str(Path(__file__).with_name('Main.qml').resolve())))
     if not engine.rootObjects():
         return 1
+    if args.smoke_test:
+        def finish_smoke():
+            window = engine.rootObjects()[0]
+            image = window.grabWindow()
+            report = {'version':VERSION, 'qml_loaded':True, 'window_icon':not app.windowIcon().isNull(), 'rendered':not image.isNull(), 'warnings':warnings}
+            if args.report:
+                destination = Path(args.report)
+                destination.parent.mkdir(parents=True, exist_ok=True)
+                destination.write_text(json.dumps(report, indent=2), encoding='utf-8')
+                image.save(str(destination.with_suffix('.png')))
+            app.exit(0 if not warnings and report['rendered'] and report['window_icon'] else 2)
+        QTimer.singleShot(700, finish_smoke)
     code = app.exec()
     controller.cancel.set()
     for worker in list(controller.workers):
         worker.wait()
-    bridge.stream.close()
-    bridge.socket.close()
+    if bridge is not None:
+        bridge.stream.close()
+        bridge.socket.close()
     return code
 
 

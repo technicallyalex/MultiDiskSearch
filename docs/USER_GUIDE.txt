@@ -1,0 +1,47 @@
+MULTI DISK SEARCH 1.0.0
+
+Requirements
+Windows 10/11, 64-bit, and DaVinci Resolve Studio 21.2.
+The installer includes the application runtime. No separate Python installation
+or package downloads are needed to run Multi Disk Search.
+
+Installation
+Run MultiDiskSearch-1.0.0-Setup.exe and follow the setup wizard.
+Restart Resolve Studio after installation.
+
+Launch
+Open a project in Resolve Studio.
+Choose Workspace > Workflow Integrations > MultiDiskSearch.
+Opening the application from the Start menu displays the launch instructions.
+
+Search and relink
+1. Add the media disks or folders you want to search.
+2. Click Find missing media.
+3. Review the results. Use Sources to choose between duplicate files.
+4. Click Relink matches, then save the project in Resolve.
+
+Search locations are saved automatically. Protected system folders and directory
+links are excluded. Progress shows completed folders/clips once totals are known.
+If any location cannot be searched, choose a source explicitly because additional
+duplicates may exist on the unreadable disk. Failed targets remain available for
+retry. Stop finishes the current folder or clip operation.
+
+Matching and previews
+Matching uses the original filename and extension, ignoring case. It does not
+compare the contents, duration or timecode of footage. Existing accessible media
+is skipped. Verify footage with repeated camera filenames before relinking.
+Resolve supplies previews where available. A locally installed FFmpeg can also
+decode previews of found sources. No footage is uploaded.
+Image sequences, renamed footage, spanned camera packages and advanced synced
+media/subclip cases are not covered by automatic matching.
+
+Settings and diagnostics
+Saved locations: %APPDATA%\MultiDiskSearch\settings.json
+Startup log: %APPDATA%\MultiDiskSearch\qt.log
+
+Uninstall
+Use Windows Settings > Apps > Installed apps > Multi Disk Search > Uninstall.
+Saved locations, Resolve projects and media are preserved.
+
+Third-party licenses
+See THIRD_PARTY_NOTICES.md and the licenses folder in the installation directory.
