@@ -33,10 +33,13 @@ Resolve also offers a deep disk search; see Blackmagic Design's [relinking guide
 
 ### Install
 
-1. Run **MultiDiskSearch-1.0.0-Setup.exe**.
+1. [Download the Windows installer](https://github.com/technicallyalex/MultiDiskSearch/releases/download/v1.0.0/MultiDiskSearch-1.0.0-Setup.exe), then run **MultiDiskSearch-1.0.0-Setup.exe**.
 2. Follow the setup wizard and approve the Windows administrator prompt when requested.
 3. Restart DaVinci Resolve Studio.
+
 The installer includes the runtime and registers the integration. **No separate Python installation or package downloads are required.**
+
+See the [v1.0.0 release](https://github.com/technicallyalex/MultiDiskSearch/releases/tag/v1.0.0) for release notes and the installer SHA-256 checksum.
 
 ## Using Multi Disk Search in Resolve
 
