@@ -9,7 +9,7 @@ Find and reconnect missing footage across multiple saved drives and folders in o
 
 ## Go beyond folder-by-folder relinking
 
-Resolve's built-in **Relink Selected Clips** tool only lets you manually search one directory at time. When footage is scattered across separate disks and folders, searching location by location adds manual work. **MultiDiskSearch searches a saved list of locations together**, then puts matches, duplicate candidates and missing files in one review window.
+Resolve's built-in **Relink Selected Clips** tool only lets you manually search one directory at a time. When footage is scattered across separate disks and folders, searching location by location adds manual work. **MultiDiskSearch searches a saved list of locations together**, then puts matches, duplicate candidates and missing files in one review window.
 
 Resolve also offers a deep disk search; see Blackmagic Design's [relinking guide](https://documents.blackmagicdesign.com/UserManuals/DaVinci-Resolve-20-Beginners-Guide.pdf).
 
