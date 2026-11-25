@@ -55,13 +55,27 @@ See the [v1.1.0 release](https://github.com/technicallyalex/MultiDiskSearch/rele
 
 Launch through Resolve, rather than the Windows Start menu, to connect the tool to your open project.
 
+## How the file index saves time
+
+The file index is a catalog of filenames and paths in your saved search locations, including subfolders. It stores file details such as size and modification time. Your footage stays on its original drives and takes up no space in the index.
+
+The first index build reads through your folders. After that, MultiDiskSearch can look up missing filenames in the saved catalog instead of walking the same folder trees on every search. This is especially useful if you relink projects often or keep footage on large archive drives or network shares. The source drives still need to be connected for MultiDiskSearch to verify and relink the files.
+
+| Search mode | When to use it |
+| --- | --- |
+| **File index** | Look up missing filenames in the catalog without scanning the drives. |
+| **Index first, then disks** | Use the catalog first, then scan the saved locations for filenames with no usable indexed match. |
+| **Drives directly** | Scan the saved locations for every missing filename using the files currently on disk. |
+
+Open **Settings** to choose where the index is stored, see how much disk space it uses, or select **Refresh all**. Automatic updates are on by default while MultiDiskSearch is open. It catches up when you reopen the app or reconnect a drive. MultiDiskSearch checks indexed candidates against the drive. Review those matches through **Sources** before relinking.
+
 ## Matching and thumbnails
 
 Matching uses the original **filename and extension**, ignoring case. It does not compare footage contents, duration or timecode. Review sources carefully when cameras reuse filenames.
 
 If a location cannot be searched, source selection becomes manual because that location may contain additional duplicates. Reconnect the disk or correct its access permissions and search again for a complete result.
 
-Cached matches require source review. Current timeline scope includes direct audio and video sources. Nested timeline, compound clip and multicam internals are outside that scope. Relinking a shared Media Pool source affects every timeline that uses it.
+Current timeline scope includes direct audio and video sources. Nested timeline, compound clip and multicam internals are outside that scope. Relinking a shared Media Pool source affects every timeline that uses it.
 
 Thumbnails come from Resolve where available. An optional locally installed FFmpeg can also generate previews of found sources; FFmpeg is not bundled or required for relinking. Some media may display a placeholder when a preview is unavailable.
 
