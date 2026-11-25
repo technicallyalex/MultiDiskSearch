@@ -1,6 +1,15 @@
-# Version 1.0.1 validation
+# MultiDiskSearch validation
 
 Platform: Windows x64. Resolve API baseline: DaVinci Resolve Studio 21.2.0.6.
+
+## Version 1.1.0
+
+- 43 regression tests passed. Coverage includes automatic storage scheduling, recursive file notifications, index snapshots and fallback, timeline scope, version comparison and installer checksum validation.
+- The local in-place installer was exercised against an existing installation. Setup waited for the supplied process to exit, replaced the registered build and passed the installed startup check.
+- Filesystem change notifications were exercised on an installed build using temporary files and subfolders. The timeline filter was also checked against an open Resolve project without changing its media.
+- A full upgrade initiated by the app from a future public release remains untested. Scheduling behavior is covered by simulated storage layouts rather than performance benchmarks across physical disks and network shares.
+
+## Version 1.0.1 baseline
 
 ## Automated coverage
 

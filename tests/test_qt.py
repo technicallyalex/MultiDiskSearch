@@ -7,12 +7,105 @@ PROJECT_ROOT = Path(__file__).resolve().parents[1]
 from unittest.mock import Mock, patch
 from PySide6.QtCore import QUrl, QEventLoop, QTimer
 from PySide6.QtGui import QGuiApplication
+from PySide6.QtNetwork import QNetworkReply
 from PySide6.QtQml import QQmlApplicationEngine
 from PySide6.QtQuickControls2 import QQuickStyle
 from qt_app import Controller, load_fonts, brand_icon
 
 
 class QuickTests(unittest.TestCase):
+    def test_update_check_compares_versions_and_uses_repository_link(self):
+        app = QGuiApplication.instance() or QGuiApplication([])
+        with tempfile.TemporaryDirectory(dir=PROJECT_ROOT) as temp:
+            controller = Controller(Mock(), Path(temp) / 'settings.json')
+            for tag, status, suffix in (
+                ('v1.10.0', '1.10.0 is available.', '/tag/v1.10.0'),
+                ('v1.0.1', 'No newer release available.', ''),
+                ('v1.2.0-rc.1', 'Could not read the release information from GitHub.', ''),
+            ):
+                with self.subTest(tag=tag), patch('qt_app.VERSION', '1.2.0'):
+                    reply = Mock()
+                    reply.error.return_value = QNetworkReply.NetworkError.NoError
+                    reply.readAll.return_value = (
+                        f'{{"tag_name":"{tag}","draft":false,"prerelease":false,'
+                        '"html_url":"https://example.com"}'
+                    ).encode()
+                    controller._update_url = ''
+                    controller._update_reply = reply
+                    controller.finishUpdateCheck()
+                    self.assertEqual(controller.updateStatus, status)
+                    expected = 'https://github.com/technicallyalex/MultiDiskSearch/releases' + suffix if suffix else ''
+                    self.assertEqual(controller.updateUrl, expected)
+                    self.assertFalse(controller.updateChecking)
+
+    def test_legacy_worker_settings_default_to_auto_and_new_overrides_persist(self):
+        app = QGuiApplication.instance() or QGuiApplication([])
+        with tempfile.TemporaryDirectory(dir=PROJECT_ROOT) as temp:
+            config = Path(temp) / 'settings.json'
+            config.write_text('{"workers": 3}', encoding='utf-8')
+            controller = Controller(Mock(), config)
+            self.assertEqual(controller.maxWorkers, 0)
+            controller.configureSearch('project', 'direct', 2)
+            self.assertEqual(Controller(Mock(), config).maxWorkers, 2)
+
+    def test_index_first_options_size_and_per_filename_review(self):
+        app=QGuiApplication.instance() or QGuiApplication([])
+        with tempfile.TemporaryDirectory(dir=PROJECT_ROOT) as temp:
+            config=Path(temp)/'settings.json'
+            controller=Controller(Mock(),config)
+            controller.configureSearch('timeline','index_first',3)
+            self.assertEqual(Controller(Mock(),config).searchMethod,'index_first')
+            self.assertEqual(controller.indexDiskSize,'0 B')
+            rows=[dict(key=str(i),name=name,old='X:/'+name,target='',status='Searching',thumbnail='',previewLabel='')
+                  for i,name in enumerate(('cached.mov','new.mov'))]
+            controller.receive('rows',rows)
+            controller.receive('matched',({'cached.mov':{'E:/cached.mov'},'new.mov':{'E:/new.mov'}},
+                ['Cached snapshot requires review'],False,{'new.mov'}))
+            self.assertEqual(controller.rows[0]['target'],'')
+            self.assertEqual(controller.rows[1]['target'],'E:/new.mov')
+            self.assertEqual(controller.readyCount,1)
+
+    def test_indexed_controller_search_requires_review_and_persists_options(self):
+        app = QGuiApplication.instance() or QGuiApplication([])
+        with tempfile.TemporaryDirectory(dir=PROJECT_ROOT) as temp:
+            root = Path(temp) / 'Footage'
+            root.mkdir()
+            target = root / 'clip.mov'
+            target.touch()
+            config = Path(temp) / 'settings.json'
+            bridge = Mock()
+            def request(command, **kwargs):
+                if command == 'inventory':
+                    return {'timeline':'Edit', 'rows':[dict(key='0',name='Clip',old='X:/missing/clip.mov',target='',status='Searching',thumbnail='',previewLabel='No preview available')]}
+                return True
+            bridge.request.side_effect = request
+            controller = Controller(bridge,config)
+            def wait():
+                loop=QEventLoop()
+                controller.changed.connect(lambda: loop.quit() if not controller.busy else None)
+                QTimer.singleShot(5000,loop.quit)
+                loop.exec()
+                for worker in list(controller.workers):
+                    worker.wait(1000)
+                app.processEvents()
+                self.assertFalse(controller.busy)
+            controller.addLocation(QUrl.fromLocalFile(str(root)))
+            wait()
+            self.assertIn('1 files',controller.roots[0]['indexDetail'])
+            controller.configureSearch('timeline','index',2)
+            with patch('qt_app.file_thumbnail',return_value=''):
+                controller.find()
+                wait()
+                self.assertEqual(controller.timelineName,'Edit')
+                self.assertEqual(controller.readyCount,0)
+                self.assertEqual(controller.rows[0]['status'],'Review source')
+                controller.chooseCandidate(0,str(target))
+                wait()
+                self.assertEqual(controller.readyCount,1)
+            reopened=Controller(bridge,config)
+            self.assertEqual((reopened.searchScope,reopened.searchMethod,reopened.maxWorkers),('timeline','index',2))
+            self.assertIn('1 files',reopened.roots[0]['indexDetail'])
+
     def test_approved_brand_icon_renders(self):
         app = QGuiApplication.instance() or QGuiApplication([])
         icon = brand_icon()

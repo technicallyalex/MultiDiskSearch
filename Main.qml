@@ -23,6 +23,124 @@ ApplicationWindow {
     }
 
     FolderDialog { id: folderDialog; title: "Choose a media disk or folder"; onAccepted: backend.addLocation(selectedFolder) }
+    FolderDialog { id: indexFolderDialog; title: "Choose a local folder for the file index"; onAccepted: backend.setIndexFolder(selectedFolder) }
+    PanelDialog {
+        id: indexDialog
+        objectName: "indexDialog"
+        title: "Settings"
+        anchors.centerIn: parent; width: Math.min(window.width - 60, 920); height: Math.min(window.height - 60, 740)
+        modal: true; standardButtons: Dialog.Close
+        onOpened: backend.refreshIndexUsage()
+        Timer { interval: 2000; running: indexDialog.visible; repeat: true; onTriggered: backend.refreshIndexUsage() }
+        ColumnLayout {
+            anchors.fill: parent; spacing: 10
+            RowLayout {
+                Layout.fillWidth: true; spacing: 8
+                Label { text: "Version " + backend.appVersion; color: Theme.text }
+                Label {
+                    text: backend.updateStatus; color: Theme.muted; font.pixelSize: 12
+                    Layout.fillWidth: true; elide: Text.ElideRight
+                    Accessible.ignored: text.length === 0
+                    ToolTip.visible: updateStatusHover.hovered && text.length > 0
+                    ToolTip.text: text
+                    HoverHandler { id: updateStatusHover }
+                }
+                ActionButton {
+                    text: backend.updateChecking ? "Checking…" : "Check for updates"
+                    enabled: !backend.updateChecking
+                    onClicked: backend.checkForUpdates()
+                }
+                ActionButton {
+                    text: "View release"; visible: backend.updateUrl.length > 0
+                    onClicked: Qt.openUrlExternally(backend.updateUrl)
+                }
+            }
+            Rectangle { Layout.fillWidth: true; implicitHeight: 1; color: Theme.border }
+            Label { text: "INDEX FOLDER"; font.pixelSize: 12; color: Theme.muted }
+            RowLayout {
+                Layout.fillWidth: true
+                TextField {
+                    text: backend.indexFolder; readOnly: true; selectByMouse: true
+                    Layout.fillWidth: true; implicitHeight: 40; padding: 10
+                    color: Theme.text; selectionColor: Theme.accent; selectedTextColor: Theme.window
+                    background: Rectangle { radius: Theme.radius; color: Theme.card; border.color: parent.activeFocus ? Theme.accent : Theme.border }
+                }
+                ActionButton { text: "Choose folder…"; enabled: !backend.busy; onClicked: indexFolderDialog.open() }
+            }
+            Label {
+                objectName: "indexDiskUsage"
+                text: "Index size on disk: " + backend.indexDiskSize
+                color: Theme.text; font.pixelSize: 12
+                ToolTip.visible: diskUsageHover.hovered
+                ToolTip.text: "Includes the database, SQLite working files and recovery backups in the selected index folder."
+                HoverHandler { id: diskUsageHover }
+            }
+            RowLayout {
+                Layout.fillWidth: true; spacing: 12
+                CheckBox {
+                text: "Keep index up to date while MultiDiskSearch is open"
+                checked: backend.autoIndexEnabled
+                onToggled: backend.setAutoIndex(checked)
+                padding: 0; implicitHeight: 32
+                indicator: Rectangle {
+                    width: 18; height: 18; radius: 4; y: (parent.height - height) / 2
+                    color: parent.checked ? Theme.accent : Theme.card
+                    border.color: parent.visualFocus ? Theme.accent : Theme.border
+                    Canvas {
+                        anchors.centerIn: parent; width: 12; height: 12; visible: parent.parent.checked
+                        onVisibleChanged: requestPaint()
+                        onPaint: {
+                            var ctx = getContext("2d")
+                            ctx.reset(); ctx.strokeStyle = Theme.window; ctx.lineWidth = 2
+                            ctx.beginPath(); ctx.moveTo(1, 6); ctx.lineTo(4.5, 9); ctx.lineTo(11, 2); ctx.stroke()
+                        }
+                    }
+                }
+                contentItem: Text { text: parent.text; leftPadding: 26; color: Theme.text; font: parent.font; verticalAlignment: Text.AlignVCenter }
+                }
+                Label {
+                    text: backend.autoIndexStatus; color: Theme.muted; font.pixelSize: 12
+                    elide: Text.ElideRight; Layout.fillWidth: true; horizontalAlignment: Text.AlignRight
+                    ToolTip.visible: autoStatusHover.hovered; ToolTip.text: text
+                    HoverHandler { id: autoStatusHover }
+                }
+            }
+            Rectangle { Layout.fillWidth: true; implicitHeight: 1; color: Theme.border; Layout.topMargin: 4; Layout.bottomMargin: 4 }
+            RowLayout {
+                Layout.fillWidth: true
+                Label { text: "INDEXED LOCATIONS"; font.pixelSize: 12; color: Theme.muted }
+                Item { Layout.fillWidth: true }
+                Label { text: backend.roots.length + " locations"; font.pixelSize: 12; color: Theme.muted }
+            }
+            RowLayout {
+                ActionButton { text: "Refresh all"; accent: true; enabled: !backend.busy; onClicked: backend.refreshIndex() }
+                ActionButton { text: "Rebuild index"; enabled: !backend.busy; onClicked: backend.rebuildIndex() }
+                ActionButton { text: "Stop"; enabled: backend.busy; onClicked: backend.stop() }
+            }
+            ListView {
+                Layout.fillWidth: true; Layout.fillHeight: true; model: backend.roots; clip: true; spacing: 7
+                ScrollBar.vertical: ScrollBar {}
+                delegate: Rectangle {
+                    required property var modelData
+                    required property int index
+                    width: ListView.view.width; height: 88; radius: Theme.radius; color: Theme.card
+                    RowLayout {
+                        anchors.fill: parent; anchors.margins: 12; spacing: 14
+                        ColumnLayout {
+                            Layout.fillWidth: true; spacing: 4
+                            Label { text: modelData.name; font.weight: Font.DemiBold; color: Theme.text; elide: Text.ElideRight; Layout.fillWidth: true }
+                            Label { text: modelData.path; font.pixelSize: 12; color: Theme.muted; elide: Text.ElideMiddle; Layout.fillWidth: true }
+                            Label { text: modelData.indexDetail + (modelData.watchState ? " · " + modelData.watchState : ""); font.pixelSize: 12; color: Theme.muted; elide: Text.ElideRight; Layout.fillWidth: true }
+                        }
+                        ColumnLayout {
+                            Label { text: modelData.scanState; color: Theme.accent; font.pixelSize: 11; Layout.alignment: Qt.AlignRight }
+                            ActionButton { text: "Refresh"; padding: 8; enabled: !backend.busy; onClicked: backend.refreshLocation(index) }
+                        }
+                    }
+                }
+            }
+        }
+    }
     Connections {
         target: backend
         function onCandidatesReady(paths, row) {
@@ -30,7 +148,7 @@ ApplicationWindow {
             candidates.currentIndex = -1; candidateDialog.open()
         }
     }
-    Dialog {
+    PanelDialog {
         id: candidateDialog
         anchors.centerIn: parent
         width: Math.min(window.width - 100, 1050); height: 420
@@ -57,7 +175,7 @@ ApplicationWindow {
             ActionButton { text: "Use selected source"; accent: true; enabled: candidates.currentIndex >= 0; onClicked: { backend.chooseCandidate(window.candidateRow, window.candidatePaths[candidates.currentIndex]); candidateDialog.close() } }
         }
     }
-    Dialog {
+    PanelDialog {
         id: errorsDialog
         anchors.centerIn: parent; width: Math.min(window.width - 100, 1000); height: 450
         title: "Search details"; modal: true; standardButtons: Dialog.Close
@@ -77,9 +195,56 @@ ApplicationWindow {
                 Accessible.name: "MultiDiskSearch"
             }
             Item { Layout.fillWidth: true }
+        }
+        RowLayout {
+            Layout.fillWidth: true; spacing: 8
+            Label { text: "Scope"; color: Theme.muted; visible: window.width >= 1180 }
+            ChoiceBox {
+                id: scopeChoice
+                objectName: "scopeChoice"
+                Accessible.name: "Search scope"
+                Layout.preferredWidth: window.width < 1180 ? 145 : 155
+                model: ["Entire project", "Current timeline"]
+                currentIndex: backend.searchScope === "timeline" ? 1 : 0
+                enabled: !backend.busy
+                onActivated: backend.configureSearch(currentIndex === 1 ? "timeline" : "project", methodChoice.selectedMethod, workerChoice.value)
+            }
+            Label { text: "Search"; color: Theme.muted; visible: window.width >= 1180 }
+            ChoiceBox {
+                id: methodChoice
+                objectName: "methodChoice"
+                Accessible.name: "Search method"
+                Layout.preferredWidth: window.width < 1180 ? 180 : 195
+                model: ["Drives directly", "File index", "Index first, then disks"]
+                property var methods: ["direct", "index", "index_first"]
+                property string selectedMethod: methods[currentIndex] || "direct"
+                implicitWidth: 195
+                currentIndex: backend.searchMethod === "index_first" ? 2 : backend.searchMethod === "index" ? 1 : 0
+                enabled: !backend.busy
+                onActivated: backend.configureSearch(scopeChoice.currentIndex === 1 ? "timeline" : "project", selectedMethod, workerChoice.value)
+            }
+            Label { text: "Workers"; color: Theme.muted; visible: window.width >= 1180 }
+            ChoiceBox {
+                id: workerChoice
+                objectName: "workerChoice"
+                model: ["Auto", "1", "2", "3", "4", "5", "6", "7", "8"]
+                currentIndex: backend.maxWorkers
+                readonly property int value: Math.max(0, currentIndex)
+                enabled: !backend.busy
+                Accessible.name: "Maximum parallel storage groups"
+                Layout.preferredWidth: window.width < 1180 ? 96 : 110
+                ToolTip.visible: hovered && !popup.visible
+                ToolTip.text: "Auto balances searches across disks and network shares. A number sets a manual limit."
+                onActivated: backend.configureSearch(scopeChoice.currentIndex === 1 ? "timeline" : "project", methodChoice.selectedMethod, currentIndex)
+            }
+            Item { Layout.fillWidth: true; Layout.minimumWidth: 0 }
+            ActionButton { text: "Settings"; onClicked: indexDialog.open() }
             ActionButton { text: "Find missing media"; accent: true; enabled: backend.connected && !backend.busy; onClicked: backend.find() }
             ActionButton { text: "Relink " + backend.readyCount + (backend.readyCount === 1 ? " match" : " matches"); enabled: !backend.busy && backend.readyCount > 0; onClicked: backend.relink() }
         }
+        Label { text: "Timeline: " + backend.timelineName; visible: backend.timelineName.length > 0; color: Theme.accent; elide: Text.ElideRight; Layout.fillWidth: true }
+        Label { text: backend.locationSummary; visible: text.length > 0; color: Theme.muted; Layout.fillWidth: true }
+        Label { text: "Current timeline scope includes direct video/audio sources. Nested timelines, compound and multicam internals are not included. Relinking shared sources also updates other timelines."; visible: backend.searchScope === "timeline"; color: Theme.muted; wrapMode: Text.WordWrap; Layout.fillWidth: true }
         Rectangle {
             Layout.fillWidth: true; implicitHeight: 46; radius: Theme.radius; color: Theme.panel
             RowLayout {
@@ -115,7 +280,7 @@ ApplicationWindow {
                         delegate: Rectangle {
                             required property var modelData
                             required property int index
-                            width: ListView.view.width; height: 90; radius: Theme.radius; color: Theme.card
+                            width: ListView.view.width; height: 165; radius: Theme.radius; color: Theme.card
                             RowLayout {
                                 anchors.fill: parent; anchors.margins: 12; spacing: 10
                                 Rectangle { width: 30; height: 22; radius: 3; color: "#454545"; border.color: "#777777"; Rectangle { width: 5; height: 3; radius: 1; color: Theme.accent; anchors.right: parent.right; anchors.bottom: parent.bottom; anchors.margins: 4 } }
@@ -123,6 +288,9 @@ ApplicationWindow {
                                     Layout.fillWidth: true
                                     Label { text: modelData.name; font.weight: Font.DemiBold; elide: Text.ElideRight; Layout.fillWidth: true }
                                     Label { text: modelData.path; color: "#aaaaaa"; font.pixelSize: 12; wrapMode: Text.WrapAnywhere; maximumLineCount: 2; elide: Text.ElideMiddle; Layout.fillWidth: true }
+                                    Label { text: modelData.scanState + (modelData.scanDetail ? " · " + modelData.scanDetail : ""); color: Theme.accent; font.pixelSize: 11; wrapMode: Text.WordWrap; Layout.fillWidth: true }
+                                    Label { text: modelData.indexDetail; color: Theme.muted; font.pixelSize: 11; wrapMode: Text.WordWrap; Layout.fillWidth: true }
+                                    ActionButton { text: "Refresh index"; enabled: !backend.busy; onClicked: backend.refreshLocation(index) }
                                 }
                                 ActionButton { text: "×"; enabled: !backend.busy; onClicked: backend.removeLocation(index); ToolTip.visible: hovered; ToolTip.text: "Remove location" }
                             }
@@ -152,14 +320,10 @@ ApplicationWindow {
                             background: Rectangle { radius: Theme.radius; color: Theme.card; border.color: searchField.activeFocus ? Theme.accent : Theme.border }
                             onTextChanged: backend.setFilter(text, statusFilter.currentText)
                         }
-                        ComboBox {
+                        ChoiceBox {
                             id: statusFilter
                             Layout.preferredWidth: 160
                             model: ["All clips", "Ready to relink", "Needs review", "Not found", "Relinked"]
-                            contentItem: Text { text: statusFilter.displayText; color: Theme.text; font: statusFilter.font; verticalAlignment: Text.AlignVCenter; leftPadding: 10; rightPadding: 22; elide: Text.ElideRight }
-                            background: Rectangle { radius: Theme.radius; color: Theme.card; border.color: statusFilter.activeFocus ? Theme.accent : Theme.border }
-                            indicator: Text { text: "v"; font.pixelSize: 10; color: Theme.muted; x: statusFilter.width - 18; anchors.verticalCenter: parent.verticalCenter }
-                            delegate: ItemDelegate { width: statusFilter.width; text: modelData; contentItem: Text { text: modelData; color: Theme.text; font: statusFilter.font } background: Rectangle { color: highlighted ? "#454c56" : Theme.panel } }
                             onActivated: backend.setFilter(searchField.text, currentText)
                         }
                     }

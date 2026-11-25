@@ -1,4 +1,4 @@
-"""Resolve objects stay on the Scripts-menu thread; Qt runs separately."""
+"""Resolve objects stay on the integration thread; Qt runs separately."""
 import json
 import os
 import secrets
@@ -21,6 +21,27 @@ class Session:
         self.resolve = resolve
         self.project = None
         self.clips = {}
+        self.timeline_snapshot = None
+
+    def timeline_sources(self, project):
+        timeline = project.GetCurrentTimeline()
+        if not timeline:
+            raise RuntimeError('Open a timeline first, or choose Entire project.')
+        sources = {}
+        for track_type in ('video', 'audio'):
+            for track in range(1, timeline.GetTrackCount(track_type) + 1):
+                for item in timeline.GetItemListInTrack(track_type, track) or []:
+                    clip = item.GetMediaPoolItem()
+                    if not clip:
+                        continue
+                    props = clip.GetClipProperty() or {}
+                    # Internal sources of nested timelines/multicam/compound items are not exposed reliably.
+                    if not props.get('File Path'):
+                        continue
+                    sources[clip.GetUniqueId()] = clip
+        signature = (timeline.GetUniqueId(), tuple(sorted((key, value.GetClipProperty('File Path'))
+                     for key, value in sources.items())))
+        return timeline, sources, signature
 
     def request(self, message):
         command = message['command']
@@ -30,8 +51,17 @@ class Session:
         if command == 'inventory':
             self.project = current
             self.clips = {}
+            self.timeline_snapshot = None
+            scoped = message.get('scope') == 'timeline'
+            timeline_name = ''
+            if scoped:
+                timeline, sources, self.timeline_snapshot = self.timeline_sources(current)
+                timeline_name = timeline.GetName()
+                inventory = sources.values()
+            else:
+                inventory = collect(current.GetMediaPool().GetRootFolder())
             rows = []
-            for clip in collect(current.GetMediaPool().GetRootFolder()):
+            for clip in inventory:
                 props = clip.GetClipProperty() or {}
                 path = props.get('File Path', '')
                 if not path or os.path.isfile(path):
@@ -40,9 +70,13 @@ class Session:
                 self.clips[key] = (clip, path)
                 rows.append(dict(key=key, name=props.get('Clip Name') or filename(path), old=path,
                                  target='', status='Searching', thumbnail='', previewLabel='No preview available'))
-            return rows
+            return {'rows': rows, 'timeline': timeline_name} if message.get('with_context') else rows
         if not self.project or current.GetUniqueId() != self.project.GetUniqueId():
             raise RuntimeError('Project changed. Find missing media again.')
+        if command == 'validate_scope':
+            if self.timeline_snapshot and self.timeline_sources(current)[2] != self.timeline_snapshot:
+                raise RuntimeError('Timeline or its sources changed. Find missing media again.')
+            return True
         clip, original = self.clips[message['key']]
         if command == 'thumbnail':
             # Export does not move the playhead or import replacement footage.
@@ -55,6 +89,8 @@ class Session:
                 pass
             return ''
         if command == 'relink':
+            if self.timeline_snapshot and self.timeline_sources(current)[2] != self.timeline_snapshot:
+                raise RuntimeError('Timeline or its sources changed. Find missing media again.')
             target = message['target']
             if filename(target) != filename(original) or not os.path.isfile(target):
                 raise RuntimeError('Matching source is no longer available.')
@@ -64,6 +100,11 @@ class Session:
             actual = clip.GetClipProperty('File Path')
             if not ok or os.path.normcase(os.path.abspath(actual)) != os.path.normcase(os.path.abspath(target)):
                 raise RuntimeError('Resolve did not confirm the target.')
+            if self.timeline_snapshot:
+                # Relinking our own source legitimately changes its path in the snapshot.
+                identity, sources = self.timeline_snapshot
+                uid = clip.GetUniqueId()
+                self.timeline_snapshot = (identity, tuple((key, actual if key == uid else path) for key, path in sources))
             return True
         raise ValueError('Unknown command')
 

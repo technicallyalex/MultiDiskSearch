@@ -1,4 +1,4 @@
-"""Multi-disk relinker. Run from Resolve's Workspace > Scripts > Utility."""
+"""Shared matching and filesystem safeguards for MultiDiskSearch."""
 import json
 import ntpath
 import os

@@ -1,1 +1,2 @@
 PySide6==6.12.0
+watchdog==7.1.1

@@ -15,12 +15,16 @@ Resolve also offers a deep disk search; see Blackmagic Design's [relinking guide
 
 ## Features
 
-- Recursive searches across saved disks and folders, with recognizable location names.
+- Parallel searches across independent disks and folders, with automatic worker scheduling.
+- A persistent file index with a selectable storage folder, a disk usage readout and automatic refresh while the app is open.
+- Index-first search with a disk scan for unmatched filenames.
+- Search the entire project or only missing sources used directly on the active timeline.
 - Automatic filename matching that skips media already accessible to Resolve.
 - Batch relinking through Resolve's native media-pool API, with result checks and retries.
 - Duplicate-source selection, thumbnails, path search and status filters.
 - Progress indicators, clip counts and a resizable Qt Quick interface.
 - Automatic exclusion of protected system folders, recycle bins and directory links.
+- In-place updates from GitHub through Settings, with Windows administrator approval.
 
 ## Installation
 
@@ -32,22 +36,22 @@ Resolve also offers a deep disk search; see Blackmagic Design's [relinking guide
 
 ### Install
 
-1. [Download the Windows installer](https://github.com/technicallyalex/MultiDiskSearch/releases/download/v1.0.1/MultiDiskSearch-1.0.1-Setup.exe), then run **MultiDiskSearch-1.0.1-Setup.exe**.
+1. [Download the Windows installer](https://github.com/technicallyalex/MultiDiskSearch/releases/download/v1.1.0/MultiDiskSearch-1.1.0-Setup.exe), then run **MultiDiskSearch-1.1.0-Setup.exe**.
 2. Follow the setup wizard and approve the Windows administrator prompt when requested.
 3. Restart DaVinci Resolve Studio.
 
 The installer includes the runtime and registers the integration. **No separate Python installation or package downloads are required.**
 
-See the [v1.0.1 release](https://github.com/technicallyalex/MultiDiskSearch/releases/tag/v1.0.1) for release notes and the installer SHA-256 checksum.
+See the [v1.1.0 release](https://github.com/technicallyalex/MultiDiskSearch/releases/tag/v1.1.0) for release notes and the installer SHA-256 checksum. For future releases, use **Settings > Check for updates**.
 
 ## Using MultiDiskSearch in Resolve
 
 1. **Open your project** in DaVinci Resolve Studio.
 2. **Launch the tool from Resolve's top menu:** **Workspace > Workflow Integrations > MultiDiskSearch**.
 3. **Add search locations.** In **Search Locations**, click **+ Add disk or folder** for each media disk or folder. Your choices are saved for future sessions.
-4. **Run the search.** Click **Find missing media**. The tool checks the project's media and searches your saved locations, including subfolders.
+4. **Run the search.** Choose a scope and search method, then click **Find missing media**. To inspect or refresh the file index, open **Settings**.
 5. **Review the results.** In **Missing Media**, inspect the original and found paths. Use the text and status filters to narrow the list. For duplicate filenames, click **Sources**, select the correct file and click **Use selected source**.
-6. **Relink and save.** Click the **Relink** button at the top right; its label shows how many matches are ready. Check the results, then save your project in Resolve.
+6. **Relink and save.** Click **Relink** on the search toolbar. Check the results, then save your project in Resolve.
 
 Launch through Resolve, rather than the Windows Start menu, to connect the tool to your open project.
 
@@ -56,6 +60,8 @@ Launch through Resolve, rather than the Windows Start menu, to connect the tool 
 Matching uses the original **filename and extension**, ignoring case. It does not compare footage contents, duration or timecode. Review sources carefully when cameras reuse filenames.
 
 If a location cannot be searched, source selection becomes manual because that location may contain additional duplicates. Reconnect the disk or correct its access permissions and search again for a complete result.
+
+Cached matches require source review. Current timeline scope includes direct audio and video sources. Nested timeline, compound clip and multicam internals are outside that scope. Relinking a shared Media Pool source affects every timeline that uses it.
 
 Thumbnails come from Resolve where available. An optional locally installed FFmpeg can also generate previews of found sources; FFmpeg is not bundled or required for relinking. Some media may display a placeholder when a preview is unavailable.
 
@@ -80,7 +86,7 @@ Open **Windows Settings > Apps > Installed apps > MultiDiskSearch > Uninstall**.
 ## Documentation
 
 - [User guide](docs/USER_GUIDE.txt)
-- [Version 1.0.1 release notes](docs/RELEASE_NOTES.md)
+- [Release notes](docs/RELEASE_NOTES.md)
 - [Validation and compatibility scope](docs/QA_REPORT.md)
 - [Building from source](docs/BUILD.md)
 - [Third-party components and license notices](packaging/THIRD_PARTY_NOTICES.md)

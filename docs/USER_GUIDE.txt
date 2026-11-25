@@ -1,4 +1,4 @@
-MultiDiskSearch 1.0.1
+MultiDiskSearch 1.1.0
 
 Requirements
 Windows 10/11, 64-bit, and DaVinci Resolve Studio 21.2.
@@ -6,7 +6,7 @@ The installer includes the application runtime. No separate Python installation
 or package downloads are needed to run MultiDiskSearch.
 
 Installation
-Run MultiDiskSearch-1.0.1-Setup.exe and follow the setup wizard.
+Run MultiDiskSearch-1.1.0-Setup.exe and follow the setup wizard.
 Restart Resolve Studio after installation.
 
 Launch
@@ -25,6 +25,45 @@ links are excluded. Progress shows completed folders/clips once totals are known
 If any location cannot be searched, choose a source explicitly because additional
 duplicates may exist on the unreadable disk. Failed targets remain available for
 retry. Stop finishes the current folder or clip operation.
+
+Search scope and parallel workers
+Scope > Current timeline includes missing direct video/audio sources used by the
+active timeline, deduplicated by Media Pool source. Nested timeline, compound and
+multicam internal sources are not included. Relinking a shared source also
+updates other timelines using it. A changed timeline requires a new search.
+Workers defaults to Auto. It adjusts to independent storage groups and limits
+network searches to two servers at a time. Choose 1-8 to set a manual limit.
+Folders sharing physical disks and shares on one server queue conservatively.
+Direct searches enumerate each folder once; totals remain unknown during the
+scan, so per-location folder/file counts accompany indeterminate progress.
+
+File index
+New locations are indexed in the background. Use Settings > Choose folder to
+select local index storage, and Refresh all or a location's Refresh index button
+for existing locations. Complete prior snapshots survive interrupted refreshes.
+Rebuild all snapshots can recover a corrupt database while retaining a backup.
+Search > File index queries cached filenames and verifies candidate files.
+Cached matches require Sources review because new duplicates may have appeared
+since indexing. Use Drives directly for current coverage and automatic unique
+match selection. No footage is stored in the metadata database.
+Index first, then disks checks the index and scans disks for filenames without a
+usable cached match. Cached candidates require review; complete live scans can
+select unique matches automatically. This mode does not refresh the index.
+Index settings show the index's allocated size on disk, including SQLite working
+files and recovery backups in the selected folder. The readout updates while open.
+Keep index up to date while MultiDiskSearch is open enables automatic recursive
+updates for file/subfolder additions, changes, moves and deletions. It is enabled
+by default and can be turned off in Settings. Normal events update
+affected paths; startup, drive reconnection and lost events trigger reconciliation.
+Unavailable notifications use periodic refreshes. Monitoring stops when the app
+closes and catches up on reopening; no Windows background service is installed.
+
+Updates
+Open Settings > Check for updates. When a newer stable GitHub release includes
+a verified Windows installer, MultiDiskSearch downloads it and asks Windows
+for administrator approval. After approval, MultiDiskSearch closes and setup
+updates your existing installation. Open MultiDiskSearch again from Resolve
+after setup finishes. View release opens the GitHub release page.
 
 Matching and previews
 Matching uses the original filename and extension, ignoring case. It does not

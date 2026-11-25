@@ -3,9 +3,10 @@ Unicode true
 !include "LogicLib.nsh"
 !include "x64.nsh"
 !include "WinVer.nsh"
+!include "FileFunc.nsh"
 
 !ifndef APP_VERSION
-!define APP_VERSION "1.0.1"
+!define APP_VERSION "1.1.0"
 !endif
 !ifndef PAYLOAD
 !error "PAYLOAD must point to the bundled application"
@@ -53,6 +54,44 @@ Function .onInit
     ${EndIf}
     SetRegView 64
     SetShellVarContext all
+    ${GetParameters} $0
+    ClearErrors
+    ${GetOptions} $0 "/UPDATEPID=" $2
+    ${IfNot} ${Errors}
+        Call WaitForUpdateExit
+    ${EndIf}
+FunctionEnd
+
+Function WaitForUpdateExit
+    ReadRegStr $INSTDIR HKLM "Software\MultiDiskSearch" "InstallDir"
+    IfFileExists "$INSTDIR\MultiDiskSearch.exe" +3
+        MessageBox MB_ICONSTOP "Setup could not find the existing MultiDiskSearch installation."
+        Abort
+    ${If} $2 <= 0
+        SetErrorLevel 1
+        Abort
+    ${EndIf}
+    System::Call 'kernel32::OpenProcess(i 0x00100000, i 0, i r2) p.r3 ?e'
+    Pop $4
+    ${If} $3 P<> 0
+        System::Call 'kernel32::WaitForSingleObject(p r3, i 60000) i.r4'
+        System::Call 'kernel32::CloseHandle(p r3)'
+    ${ElseIf} $4 == 87
+        ; The frontend may have exited before setup initialized.
+        StrCpy $4 0
+    ${EndIf}
+    ${If} $4 == 0
+        ; A second running frontend must not cause a partly overwritten install.
+        StrCpy $5 "$INSTDIR\MultiDiskSearch.exe"
+        System::Call 'kernel32::CreateFileW(w r5, i 0x40000000, i 0, p 0, i 3, i 0x80, p 0) p.r3'
+        ${If} $3 P<> -1
+            System::Call 'kernel32::CloseHandle(p r3)'
+            Return
+        ${EndIf}
+    ${EndIf}
+    MessageBox MB_ICONSTOP "MultiDiskSearch is still open or setup could not access it. Close all MultiDiskSearch windows and try again."
+    SetErrorLevel 1
+    Abort
 FunctionEnd
 
 Function un.onInit

@@ -1,4 +1,4 @@
-# Build MultiDiskSearch 1.0.1
+# Build MultiDiskSearch
 
 Build on 64-bit Windows with Python 3.14 and NSIS 3.12.
 
@@ -8,11 +8,11 @@ Build on 64-bit Windows with Python 3.14 and NSIS 3.12.
 4. Run the regression suite and installer builder from the repository root:
 
 ```powershell
-.\.venv\Scripts\python.exe -B -m unittest -v
+.\.venv\Scripts\python.exe -B -m unittest discover -s tests -v
 .\.venv\Scripts\python.exe -B tools\build_installer.py
 ```
 
-The builder uses PyInstaller with a QML module allowlist, copies the Resolve host components and license notices, generates a payload hash inventory, and compiles packaging/installer.nsi. Output is dist/MultiDiskSearch-1.0.1-Setup.exe with a SHA-256 checksum.
+The builder uses PyInstaller with a QML module allowlist, copies the Resolve host components and license notices, generates a payload hash inventory, and compiles packaging/installer.nsi. Output is `dist/MultiDiskSearch-<version>-Setup.exe` with a SHA-256 checksum.
 
 The frontend is a bundled Qt Quick executable. The Resolve integration launcher stays with the installed app, and setup registers it in Resolve's Workflow Integration Plugins directory. No Blackmagic SDK binaries or FFmpeg executable are distributed.
 

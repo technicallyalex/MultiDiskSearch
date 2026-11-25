@@ -43,8 +43,8 @@ def main():
                '--name', 'MultiDiskSearch', '--icon', str(icon), '--version-file', str(version_info),
                '--distpath', str(build/'bundle'), '--workpath', str(build/'pyinstaller'),
                '--specpath', str(build), '--additional-hooks-dir', str(ROOT/'packaging/hooks'),
-               '--hidden-import', 'PySide6.QtSvg']
-    for name in ('Main.qml','Theme.qml','ActionButton.qml','qmldir'):
+               '--hidden-import', 'PySide6.QtSvg', '--hidden-import', 'watchdog.observers.read_directory_changes']
+    for name in ('Main.qml','Theme.qml','ActionButton.qml','ChoiceBox.qml','NumberBox.qml','PanelDialog.qml','qmldir'):
         command += ['--add-data', f'{ROOT/name}:.']
     command += ['--add-data', f'{ROOT/"assets"}:assets', str(ROOT/'qt_app.py')]
     subprocess.run(command, cwd=ROOT, check=True, env=environment)
@@ -64,7 +64,7 @@ def main():
     if not python_license.exists():
         raise RuntimeError('Python distribution license is missing.')
     shutil.copy2(python_license, licenses/'Python-LICENSE.txt')
-    for package in ('pyside6-essentials','pyside6-addons','shiboken6','pyinstaller'):
+    for package in ('pyside6-essentials','pyside6-addons','shiboken6','pyinstaller','watchdog'):
         distribution = importlib.metadata.distribution(package)
         for entry in distribution.files or []:
             if 'licenses/' in str(entry).replace('\\','/'):
